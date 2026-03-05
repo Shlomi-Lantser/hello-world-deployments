@@ -1,0 +1,67 @@
+replicaCount: 2
+
+image:
+  repository: 959499649203.dkr.ecr.us-east-1.amazonaws.com/hello-world
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 9000
+
+# ALB Ingress - disabled, traffic goes through Istio Gateway instead
+ingress:
+  enabled: false
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+  hosts:
+    - paths:
+        - path: /
+          pathType: Prefix
+
+# Istio service mesh configuration
+istio:
+  enabled: true
+
+  gateway:
+    # Hostname to match on the Gateway - use "*" for any host
+    # Change to your actual domain if you have one e.g. "hello-world.example.com"
+    host: "*"
+
+  mtls:
+    # STRICT: all pod-to-pod traffic in this namespace must use mTLS
+    # PERMISSIVE: allow both mTLS and plain text (useful for debugging)
+    mode: STRICT
+
+  virtualService:
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 9000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 9000
+  initialDelaySeconds: 5
+  periodSeconds: 5
