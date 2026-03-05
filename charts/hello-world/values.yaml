@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: 959499649203.dkr.ecr.us-east-1.amazonaws.com/hello-world
+  repository: 128955061512.dkr.ecr.eu-west-1.amazonaws.com/hello-world
   tag: "158966b"
   pullPolicy: Always
 
