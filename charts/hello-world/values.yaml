@@ -38,6 +38,10 @@ istio:
     # PERMISSIVE: allow both mTLS and plain text (useful for debugging)
     mode: STRICT
 
+  tls:
+    enabled: true
+    credentialName: hello-world-tls
+
   virtualService:
     timeout: 30s
     retries:
